@@ -1,0 +1,60 @@
+┏ ┓ ┃ ━ ┣ ┫ ┳ ┻ ╋ ┗ ┛
+┏━━━━━━━━━━━━━━┓
+┃              ┃
+┃              ┃
+┃              ┃
+┃              ┃
+┗━━━━━━━━━━━━━━┛
+
+
+
+/ = door
+|-+ = wall
++-+-+-----------+
+|0/1|           |
++-+-+           |
+|2|             |
++-+             |
+|               |
++---------------+
+
+-1) template
+- desc
+    - None
+- items
+    - None
+- action
+    - None
+- places
+    - None
+
+0) walk-in cupboard
+- desc
+    - ?
+- items
+    - pile of clothes
+        - desc
+            - None
+        - items
+            - afikoman
+                - desc
+                    - None
+                - items
+                    - None
+                - action
+                    - win
+        - action
+            - None
+- action
+    - None
+- places
+    - 2
+1) master bedroom
+- desc
+    - ?
+- items
+
+
+
+
+≡
