@@ -43,7 +43,7 @@ class Game(ctk.CTk):
         self.rowconfigure([1], weight=1)
 
         self.name_label = ctk.CTkLabel(self, textvariable=self.name)
-        self.desc_label = ctk.CTkLabel(self, textvariable=self.desc,justify="center")
+        self.desc_label = ctk.CTkLabel(self, textvariable=self.desc, justify="center")
 
         self.name_label.grid(column=0, row=0, padx=7, pady=7, sticky="ew")
         self.desc_label.grid(column=0, row=1, padx=7, pady=7, sticky="nsew")
