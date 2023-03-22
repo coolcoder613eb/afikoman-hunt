@@ -5,17 +5,18 @@ class Thing:
         menu=None,
         desc=None,
         items=None,
-        action=None,
+        on_take=None,
         places=None,
-        moveable=False,
+        # moveable=False,
     ):
         self.name = name  # for all
         self.menu = menu  # for item
         self.desc = desc  # for all (look)
         self.items = items  # for all (look)
-        self.action = action  # for use
-        self.places = places  # for place (go to)
-        self.moveable = moveable  # for item (take)
+        self.on_take = on_take  # for take
+        self.places = places  # for place (open)
+        self.moveable = not not self.on_take
+        # self.moveable = moveable  # for item (take)
 
 
 class Door:

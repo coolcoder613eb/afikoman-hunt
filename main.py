@@ -5,10 +5,6 @@ from tkinter import ttk
 from tkinter import messagebox
 
 
-def win():
-    print("Win placeholder")
-
-
 class Game(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -30,7 +26,20 @@ class Game(ctk.CTk):
                 + "You see mostly empty shelves\n"
                 + "and some clothes hanging from\n"
                 + "a rod on the wall.",
-                items=[Thing("Pile of clothes", items=[Thing("Afikoman", action=win)])],
+                items=[
+                    Thing(
+                        "Pile of clothes",
+                        desc="These clothes must have fallen from the rod.",
+                        items=[
+                            Thing(
+                                "Afikoman",
+                                desc="This is the Afikoman you've been looking for.",
+                                on_take=self.win,
+                                # moveable=True,
+                            )
+                        ],
+                    )
+                ],
                 places=[self.doors[0]],
             ),
             Thing(
@@ -127,26 +136,33 @@ class Game(ctk.CTk):
         )
 
     def open_door(self, door):
-        self.current_room = door.dest[self.current_room]
-        self.name.set(self.places[self.current_room].name)
-        self.show(
-            self.look_at(self.places[self.current_room], show=False),
-            f"Open {door.name}",
-        )
-        self.gen_menus(self.places[self.current_room], True)
+        if not door.locked:
+            self.current_room = door.dest[self.current_room]
+            self.name.set(self.places[self.current_room].name)
+            self.show(
+                self.look_at(self.places[self.current_room], show=False),
+                f"Open {door.name}",
+            )
+            self.gen_menus(self.places[self.current_room], True)
+        else:
+            self.show(
+                "That door is locked.",
+                f"Open {door.name}",
+            )
 
     def look_at(self, thing, showcmd=True, surr=False, show=True):
         desc = (
-            (
-                "\n".join(
-                    (thing.desc, *(f"There is a {x.name} here." for x in thing.items))
+            "\n".join(
+                (
+                    thing.desc if thing.desc else "...",
+                    *(f"There is a {x.name} here." for x in thing.items),
                 )
-                if thing.items
-                else thing.desc
             )
-            if thing.desc
-            else "..."
+            if thing.items
+            else thing.desc
         )
+        if thing.items:
+            self.gen_menus(thing)
         if show:
             self.show(
                 desc,
@@ -157,7 +173,10 @@ class Game(ctk.CTk):
             return desc
 
     def take_item(self, item):
-        pass
+        item.on_take()
+
+    def win(self):
+        self.show("***YOU WON***", "Take Afikoman")
 
     def gen_menus(self, thing, new=False):
         # current_place = self.places[self.first]
@@ -174,7 +193,7 @@ class Game(ctk.CTk):
 
         if thing.items:
             for item in thing.items:
-                if isinstance(item, Thing):
+                if isinstance(item, Thing) and item.moveable:
                     self.take_menu.add_command(
                         label=item.name, command=lambda item=item: self.take_item(item)
                     )
