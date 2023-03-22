@@ -14,11 +14,22 @@ class Game(ctk.CTk):
         super().__init__()
         self.first = 1  # starting room
         self.current_room = self.first
-        self.doors = [Door("Cupboard door", {1: 0, 0: 1})]
+        self.doors = [
+            Door(
+                "Cupboard door",
+                {1: 0, 0: 1},
+                desc="This is the door to the walk-in cupboard.",
+            )
+        ]
 
         self.places = [
             Thing(
                 "Walk-in cupboard",
+                desc="You are in the walk-in cupboard.\n"
+                + "As you look around the slightly cramped space,\n"
+                + "You see mostly empty shelves\n"
+                + "and some clothes hanging from\n"
+                + "a rod on the wall.",
                 items=[Thing("Pile of clothes", items=[Thing("Afikoman", action=win)])],
                 places=[self.doors[0]],
             ),
@@ -42,8 +53,14 @@ class Game(ctk.CTk):
         self.columnconfigure([0], weight=1)
         self.rowconfigure([1], weight=1)
 
-        self.name_label = ctk.CTkLabel(self, textvariable=self.name)
-        self.desc_label = ctk.CTkLabel(self, textvariable=self.desc, justify="center")
+        self.menu_style = ttk.Style()
+
+        self.menu_style.configure("menu_style.TMenubutton", font=(None, 14))
+
+        self.name_label = ctk.CTkLabel(self, textvariable=self.name, font=(None, 22))
+        self.desc_label = ctk.CTkLabel(
+            self, textvariable=self.desc, font=(None, 18), justify="center"
+        )
 
         self.name_label.grid(column=0, row=0, padx=7, pady=7, sticky="ew")
         self.desc_label.grid(column=0, row=1, padx=7, pady=7, sticky="nsew")
@@ -56,48 +73,99 @@ class Game(ctk.CTk):
         total_height = sum(
             widget.winfo_reqheight() + 5 for widget in self.winfo_children()
         )
-        total_width = sum(widget.winfo_reqwidth() for widget in self.winfo_children())
+        total_width = sum(
+            widget.winfo_reqwidth() + 5 for widget in self.winfo_children()
+        )
 
         self.minsize(width=total_width, height=total_height)
 
         # Menus
-        self.open_menu = tk.Menu(self.menu_frame, tearoff=0)
+        self.open_menu = tk.Menu(self.menu_frame, tearoff=0, font=(None, 14))
         self.open_menubutton = ttk.Menubutton(
-            self.menu_frame, text="Open", menu=self.open_menu, width=10
+            self.menu_frame,
+            text="Open",
+            menu=self.open_menu,
+            width=10,
+            style="menu_style.TMenubutton",
         )
         self.open_menubutton.grid(column=0, row=0, padx=7, pady=7)
 
-        self.look_at_menu = tk.Menu(self.menu_frame, tearoff=0)
+        self.look_at_menu = tk.Menu(self.menu_frame, tearoff=0, font=(None, 14))
         self.look_at_menubutton = ttk.Menubutton(
-            self.menu_frame, text="Look at", menu=self.look_at_menu, width=10
+            self.menu_frame,
+            text="Look at",
+            menu=self.look_at_menu,
+            width=10,
+            style="menu_style.TMenubutton",
         )
         self.look_at_menubutton.grid(column=0, row=1, padx=7, pady=7)
 
-        self.take_menu = tk.Menu(self.menu_frame, tearoff=0)
+        self.take_menu = tk.Menu(self.menu_frame, tearoff=0, font=(None, 14))
         self.take_menubutton = ttk.Menubutton(
-            self.menu_frame, text="Take", menu=self.take_menu, width=10
+            self.menu_frame,
+            text="Take",
+            menu=self.take_menu,
+            width=10,
+            style="menu_style.TMenubutton",
         )
         self.take_menubutton.grid(column=0, row=2, padx=7, pady=7)
 
-        self.gen_menus(self.places[self.current_room])
+        self.gen_menus(self.places[self.current_room],True)
 
         self.mainloop()
 
-    def open_door(self, door):
-        pass
+    def show(self, text, action="", showcmd=True):
+        self.desc.set(
+            "\n".join(
+                (
+                    self.desc.get()
+                    + "\n"
+                    + (f"[{action}:]\n" if showcmd else "")
+                    + text
+                ).splitlines()[-20:]
+            )
+        )
 
-    def look_at(self, thing):
-        pass
+    def open_door(self, door):
+        self.current_room = door.dest[self.current_room]
+        self.name.set(self.places[self.current_room].name)
+        self.show(
+            self.look_at(self.places[self.current_room], show=False),
+            f"Open {door.name}",
+        )
+        self.gen_menus(self.places[self.current_room],True)
+
+    def look_at(self, thing, showcmd=True, surr=False, show=True):
+        desc = (
+            "\n".join(
+                (thing.desc, *(f"There is a {x.name} here." for x in thing.items)) ##########
+            )
+            if thing.items
+            else thing.desc
+        )
+        if show:
+            self.show(
+                desc,
+                f"Look at {'Surroundings' if surr else thing.name}",
+                showcmd=showcmd,
+            )
+        else:
+            return desc
 
     def take_item(self, item):
         pass
 
-    def gen_menus(self, thing):
+    def gen_menus(self, thing, new=False):
         # current_place = self.places[self.first]
+        if new:
+            self.open_menu.delete(0,"end")
+            self.look_at_menu.delete(0,"end")
+            self.take_menu.delete(0,"end")
         if thing in self.places:
             if thing.desc:
                 self.look_at_menu.add_command(
-                    label="Surroundings", command=lambda item=thing: self.look_at(item)
+                    label="Surroundings",
+                    command=lambda item=thing: self.look_at(item, surr=True),
                 )
 
         if thing.items:
@@ -117,6 +185,10 @@ class Game(ctk.CTk):
                 self.open_menu.add_command(
                     label=place.name, command=lambda door=place: self.open_door(door)
                 )
+                if place.desc:
+                    self.look_at_menu.add_command(
+                        label=place.name, command=lambda item=place: self.look_at(item)
+                    )
 
 
 if __name__ == "__main__":

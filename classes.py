@@ -24,3 +24,4 @@ class Door:
         self.dest = dest
         self.desc = desc
         self.locked = locked
+        self.items = False
