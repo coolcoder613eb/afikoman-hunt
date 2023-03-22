@@ -110,7 +110,7 @@ class Game(ctk.CTk):
         )
         self.take_menubutton.grid(column=0, row=2, padx=7, pady=7)
 
-        self.gen_menus(self.places[self.current_room],True)
+        self.gen_menus(self.places[self.current_room], True)
 
         self.mainloop()
 
@@ -133,15 +133,19 @@ class Game(ctk.CTk):
             self.look_at(self.places[self.current_room], show=False),
             f"Open {door.name}",
         )
-        self.gen_menus(self.places[self.current_room],True)
+        self.gen_menus(self.places[self.current_room], True)
 
     def look_at(self, thing, showcmd=True, surr=False, show=True):
         desc = (
-            "\n".join(
-                (thing.desc, *(f"There is a {x.name} here." for x in thing.items)) ##########
+            (
+                "\n".join(
+                    (thing.desc, *(f"There is a {x.name} here." for x in thing.items))
+                )
+                if thing.items
+                else thing.desc
             )
-            if thing.items
-            else thing.desc
+            if thing.desc
+            else "..."
         )
         if show:
             self.show(
@@ -158,9 +162,9 @@ class Game(ctk.CTk):
     def gen_menus(self, thing, new=False):
         # current_place = self.places[self.first]
         if new:
-            self.open_menu.delete(0,"end")
-            self.look_at_menu.delete(0,"end")
-            self.take_menu.delete(0,"end")
+            self.open_menu.delete(0, "end")
+            self.look_at_menu.delete(0, "end")
+            self.take_menu.delete(0, "end")
         if thing in self.places:
             if thing.desc:
                 self.look_at_menu.add_command(
