@@ -178,6 +178,14 @@ class Game(ctk.CTk):
     def win(self):
         self.show("***YOU WON***", "Take Afikoman")
 
+    def is_in_menu(self, menu, name):
+        last = menu.index(tk.END)
+        last = last if last != None else 0
+        for x in range(last + 1):
+            if menu.entrycget(x, "label") == name:
+                return True
+        return False
+
     def gen_menus(self, thing, new=False):
         # current_place = self.places[self.first]
         if new:
@@ -193,11 +201,17 @@ class Game(ctk.CTk):
 
         if thing.items:
             for item in thing.items:
-                if isinstance(item, Thing) and item.moveable:
+                if (
+                    isinstance(item, Thing)
+                    and item.moveable
+                    and not self.is_in_menu(self.take_menu, item.name)
+                ):
                     self.take_menu.add_command(
                         label=item.name, command=lambda item=item: self.take_item(item)
                     )
-                if item.desc or item.items:
+                if (item.desc or item.items) and not self.is_in_menu(
+                    self.look_at_menu, item.name
+                ):
                     self.look_at_menu.add_command(
                         label=item.name, command=lambda item=item: self.look_at(item)
                     )
