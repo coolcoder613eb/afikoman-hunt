@@ -172,7 +172,8 @@ class Game(ctk.CTk):
         else:
             return desc
 
-    def take_item(self, item):
+    def take_item(self, item, parent):
+        parent.items.pop(parent.items.index(item))
         item.on_take()
 
     def win(self):
@@ -193,7 +194,7 @@ class Game(ctk.CTk):
             self.look_at_menu.delete(0, "end")
             self.take_menu.delete(0, "end")
         if thing in self.places:
-            if thing.desc:
+            if thing.desc and not self.is_in_menu(self.look_at_menu, "Surroundings"):
                 self.look_at_menu.add_command(
                     label="Surroundings",
                     command=lambda item=thing: self.look_at(item, surr=True),
@@ -207,7 +208,7 @@ class Game(ctk.CTk):
                     and not self.is_in_menu(self.take_menu, item.name)
                 ):
                     self.take_menu.add_command(
-                        label=item.name, command=lambda item=item: self.take_item(item)
+                        label=item.name, command=lambda item=item: self.take_item(item,thing)
                     )
                 if (item.desc or item.items) and not self.is_in_menu(
                     self.look_at_menu, item.name
@@ -219,10 +220,12 @@ class Game(ctk.CTk):
                 #    self.menu_frame.add_cascade(label=item.name, menu=self.menu)
         if thing.places:
             for place in thing.places:
-                self.open_menu.add_command(
-                    label=place.name, command=lambda door=place: self.open_door(door)
-                )
-                if place.desc:
+                if not self.is_in_menu(self.open_menu, place.name):
+                    self.open_menu.add_command(
+                        label=place.name,
+                        command=lambda door=place: self.open_door(door),
+                    )
+                if place.desc and not self.is_in_menu(self.look_at_menu, place.name):
                     self.look_at_menu.add_command(
                         label=place.name, command=lambda item=place: self.look_at(item)
                     )

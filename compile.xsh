@@ -1,7 +1,7 @@
 import sys
 
 def compile(exename):
-    @(sys.executable) -m nuitka main.py -o @(exename) --standalone --onefile --disable-console --enable-plugin=tk-inter --include-data-dir=./customtkinter=./customtkinter
+    @(sys.executable) -m nuitka main.py -o @(exename) --standalone --onefile --disable-console --windows-icon-from-ico=icon.ico --enable-plugin=tk-inter --include-data-dir=./customtkinter=./customtkinter
 
 
 i = input("(D)emo, (R)elease, or (C)lean?")
