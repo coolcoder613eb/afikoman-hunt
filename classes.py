@@ -2,7 +2,6 @@ class Thing:
     def __init__(
         self,
         name,
-        menu=None,
         desc=None,
         items=None,
         on_take=None,
@@ -10,7 +9,6 @@ class Thing:
         # moveable=False,
     ):
         self.name = name  # for all
-        self.menu = menu  # for item
         self.desc = desc  # for all (look)
         self.items = items  # for all (look)
         self.on_take = on_take  # for take
