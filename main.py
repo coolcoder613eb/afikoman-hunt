@@ -8,14 +8,21 @@ from tkinter import messagebox
 class Game(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.first = 1  # starting room
+        self.first = 2  # starting room
         self.current_room = self.first
         self.doors = [
             Door(
                 "Cupboard door",
                 {1: 0, 0: 1},
                 desc="This is the door to the walk-in cupboard.",
-            )
+            ),
+            Door(
+                "Master Bedroom door",
+                {2: 1, 1: 2},
+                desc="This is the the door to the master bedroom.",
+                locked=True,
+            ),
+            Door("Kitchen Door", {2: 3, 3: 2}, desc="This is the door to the kitchen."),
         ]
 
         self.places = [
@@ -51,6 +58,14 @@ class Game(ctk.CTk):
                 + "and several cardboard boxes.",
                 places=[self.doors[0]],
             ),
+            Thing(
+                "Hallway",
+                desc="As you look around the hallway\n" + "you see nothing of note.",
+                places=[self.doors[1], self.doors[2]],
+            ),
+            Thing("Kitchen",
+            items=[Thing()], ################################
+            places=[self.doors[2]]),
         ]
 
     def run(self):
@@ -208,7 +223,8 @@ class Game(ctk.CTk):
                     and not self.is_in_menu(self.take_menu, item.name)
                 ):
                     self.take_menu.add_command(
-                        label=item.name, command=lambda item=item: self.take_item(item,thing)
+                        label=item.name,
+                        command=lambda item=item: self.take_item(item, thing),
                     )
                 if (item.desc or item.items) and not self.is_in_menu(
                     self.look_at_menu, item.name
