@@ -23,6 +23,11 @@ class Game(ctk.CTk):
                 locked=True,
             ),
             Door("Kitchen Door", {2: 3, 3: 2}, desc="This is the door to the kitchen."),
+            Door(
+                "Serving door",
+                {2: 4, 4: 2},
+                desc="This is the door between the kitchen and dining room.",
+            ),
         ]
 
         self.places = [
@@ -63,9 +68,23 @@ class Game(ctk.CTk):
                 desc="As you look around the hallway\n" + "you see nothing of note.",
                 places=[self.doors[1], self.doors[2]],
             ),
-            Thing("Kitchen",
-            items=[Thing()], ################################
-            places=[self.doors[2]]),
+            Thing(
+                "Kitchen",
+                desc="You are in a kitchen with\n"
+                + "a tiled floor.\n"
+                + "You see\n"
+                + "a marble counter with a sink,\n"
+                + "a small oven,\n"
+                + "and a disproportionately large fridge/freezer.",
+                items=[
+                    Thing(
+                        "Cupboard",
+                        desc="This is the kitchen cupboard.\n" + "It is locked.",
+                    )
+                ],
+                places=[self.doors[2],self.doors[3]],
+            ),
+            # Dining room
         ]
 
     def run(self):
