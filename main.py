@@ -85,6 +85,8 @@ class Game(ctk.CTk):
                 places=[self.doors[2],self.doors[3]],
             ),
             # Dining room
+            #Thing()
+
         ]
 
     def run(self):
