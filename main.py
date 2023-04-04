@@ -44,7 +44,7 @@ class Game(ctk.CTk):
                 desc="This is the door to the younger kids bedroom.",
             ),
             Door(
-                "Front door", {7: 2, 2: 7}, desc="This is the door back to the house."
+                "Front door", {7: 2, 0: 7}, desc="This is the door back to the house."
             ),
         ]
 
