@@ -25,8 +25,26 @@ class Game(ctk.CTk):
             Door("Kitchen Door", {2: 3, 3: 2}, desc="This is the door to the kitchen."),
             Door(
                 "Serving door",
-                {2: 4, 4: 2},
+                {3: 4, 4: 3},
                 desc="This is the door between the kitchen and dining room.",
+            ),
+            Door(
+                "Dining room door",
+                {2: 4, 4: 2},
+                desc="This is the door to the dining room.",
+            ),
+            Door(
+                "Older kids bedroom door",
+                {2: 5, 5: 2},
+                desc="This is the door to the older kids bedroom.",
+            ),
+            Door(
+                "Younger kids bedroom door",
+                {2: 6, 6: 2},
+                desc="This is the door to the younger kids bedroom.",
+            ),
+            Door(
+                "Front door", {7: 2, 2: 7}, desc="This is the door back to the house."
             ),
         ]
 
@@ -61,12 +79,18 @@ class Game(ctk.CTk):
                 + "with a bedside table betweeen them,\n"
                 + "a walk-in cupboard,\n"
                 + "and several cardboard boxes.",
-                places=[self.doors[0]],
+                places=[self.doors[1], self.doors[0]],
             ),
             Thing(
                 "Hallway",
                 desc="As you look around the hallway\n" + "you see nothing of note.",
-                places=[self.doors[1], self.doors[2]],
+                places=[
+                    self.doors[1],
+                    self.doors[2],
+                    self.doors[4],
+                    self.doors[5],
+                    self.doors[6],
+                ],
             ),
             Thing(
                 "Kitchen",
@@ -82,11 +106,81 @@ class Game(ctk.CTk):
                         desc="This is the kitchen cupboard.\n" + "It is locked.",
                     )
                 ],
-                places=[self.doors[2],self.doors[3]],
+                places=[self.doors[2], self.doors[3]],
             ),
             # Dining room
-            #Thing()
-
+            Thing(
+                "Dining room",
+                desc="As you enter the dining room you see\n"
+                + "numerous bookshelves lining one wall\n"
+                + "with a breakfront in the center.",
+                items=[
+                    Thing(
+                        "Table",
+                        desc="This is the table.\n" + "It is empty.",
+                        items=[Thing("Note", desc="The note reads: update zork")],
+                    )
+                ],
+                places=[self.doors[4], self.doors[3]],
+            ),
+            Thing(
+                "Older kids bedroom",
+                desc="In the older kids bedroom you see\n"
+                + "two single beds,\n"
+                + "and a clothes cupboard",
+                items=[
+                    Thing(
+                        "Bookshelf",
+                        desc="On the bookshelf you see various titles,\n"
+                        + "including '101 BASIC computer games'.",
+                    )
+                ],
+                places=[self.doors[5]],
+            ),
+            Thing(
+                "Younger kids bedroom",
+                desc="In the younger kids bedroom you see\n"
+                + "two single beds\n"
+                + "in green and yellow,\n"
+                + "and a clothes cupboard.",
+                items=[
+                    Thing(
+                        "Toybox",
+                        desc="You look through the toybox.",
+                        items=[
+                            Thing(
+                                "Key",
+                                desc="This is the key to the master bedroom.",
+                                on_take=self.get_key,
+                            )
+                        ],
+                    )
+                ],
+                places=[self.doors[6]],
+            ),
+            Thing(
+                "Garden",
+                desc="You are in the garden\n" + "at the end of the game.",
+                items=[
+                    Thing(
+                        "Plaque",
+                        desc="The plaque reads:\n"
+                        + "Credits:\n"
+                        + "Programming: Elozor Bruce\n"
+                        + "Design: Elozor Bruce & Ella Bruce",
+                    ),
+                    # Thing(
+                    #     "Piece of paper",
+                    #     desc="This is a printout of some of the game code.\n"
+                    #     + "It reads:\n"
+                    #     + "    def take_item(self, item, parent):                         \n"
+                    #     + "        parent.items.pop(parent.items.index(item))             \n"
+                    #     + "        self.gen_menus(self.places[self.current_room],new=True)\n"
+                    #     + "        item.on_take()                                         ",
+                    # ),
+                ],
+                places=[self.doors[7]],
+            ),
         ]
 
     def run(self):
@@ -171,20 +265,18 @@ class Game(ctk.CTk):
             )
         )
 
-    def open_door(self, door):
+    def open_door(self, door, show=True):
         if not door.locked:
             self.current_room = door.dest[self.current_room]
             self.name.set(self.places[self.current_room].name)
             self.show(
                 self.look_at(self.places[self.current_room], show=False),
                 f"Open {door.name}",
+                showcmd=show,
             )
             self.gen_menus(self.places[self.current_room], True)
         else:
-            self.show(
-                "That door is locked.",
-                f"Open {door.name}",
-            )
+            self.show("That door is locked.", f"Open {door.name}", showcmd=show)
 
     def look_at(self, thing, showcmd=True, surr=False, show=True):
         desc = (
@@ -210,10 +302,16 @@ class Game(ctk.CTk):
 
     def take_item(self, item, parent):
         parent.items.pop(parent.items.index(item))
+        self.gen_menus(self.places[self.current_room], new=True)
         item.on_take()
 
     def win(self):
-        self.show("***YOU WON***", "Take Afikoman")
+        self.show("***YOU WON***\n" + "There is a loud whoosh.", "Take Afikoman")
+        self.open_door(self.doors[7], False)
+
+    def get_key(self):
+        self.show("You take the key.", "Take Key")
+        self.doors[1].locked = False
 
     def is_in_menu(self, menu, name):
         last = menu.index(tk.END)
